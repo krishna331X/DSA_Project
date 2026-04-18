@@ -3,25 +3,28 @@
 <head>
     <title>Simple DSA To-Do</title>
     <style>
-        body { font-family: sans-serif; display: flex; justify-content: center; background: #f0f0f0; }
-        .box { background: white; padding: 20px; border-radius: 10px; width: 300px; margin-top: 50px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        input { padding: 8px; width: 180px; }
-        button { padding: 8px; cursor: pointer; }
-        li { background: #eee; margin-top: 5px; padding: 8px; display: flex; justify-content: space-between; border-radius: 4px; }
-        .del-btn { background: red; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; background: #f0f0f0; padding-top: 50px; }
+        .box { background: white; padding: 20px; border-radius: 10px; width: 300px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #333; font-size: 18px; margin-bottom: 20px; }
+        input { padding: 8px; width: 180px; border: 1px solid #ddd; border-radius: 4px; }
+        button { padding: 8px; cursor: pointer; border-radius: 4px; }
+        .add-btn { background: #27ae60; color: white; border: none; }
+        ul { list-style: none; padding: 0; }
+        li { background: #eee; margin-top: 5px; padding: 10px; display: flex; justify-content: space-between; border-radius: 4px; align-items: center; }
+        .del-btn { background: #e74c3c; color: white; border: none; border-radius: 3px; cursor: pointer; padding: 5px 8px; }
     </style>
 </head>
 <body>
 
+<h2>DSA Project: Linked List TO-DO-LIST</h2>
+
 <div class="box">
-    <h3>My Tasks</h3>
     <input type="text" id="taskInput" placeholder="Write task...">
-    <button onclick="addTask()">Add</button>
+    <button class="add-btn" onclick="addTask()">Add</button>
     <ul id="taskList"></ul>
 </div>
 
 <script>
-    // 1. Linked List structure
     class Node {
         constructor(id, text) {
             this.id = id;
@@ -30,13 +33,12 @@
         }
     }
 
-    let head = null; // List ki shuruat
-    let count = 0;   // Har task ke liye unique ID
+    let head = null;
+    let count = 0;
 
-    // 2. Insert at End
     function addTask() {
         let input = document.getElementById("taskInput");
-        if (input.value === "") return; // Khali input handle karein
+        if (input.value === "") return;
 
         count++;
         let newNode = new Node(count, input.value);
@@ -49,15 +51,12 @@
             temp.next = newNode;
         }
 
-        input.value = ""; // Box khali karein
-        render(); // Website update karein
+        input.value = "";
+        render();
     }
 
-    // 3. To delete task
     function deleteTask(id) {
         if (head === null) return;
-
-        // Agar pehla hi task delete karna ho
         if (head.id === id) {
             head = head.next;
         } else {
@@ -66,27 +65,31 @@
                 temp = temp.next;
             }
             if (temp.next !== null) {
-                temp.next = temp.next.next; // Connection tod kar aage jodna
+                temp.next = temp.next.next;
             }
         }
-        render(); // Website update karein
+        render();
     }
 
-    // 4. To See in Screen
     function render() {
         let listHtml = document.getElementById("taskList");
-        listHtml.innerHTML = ""; // Purani list clear karein
-
+        listHtml.innerHTML = "";
         let temp = head;
         while (temp !== null) {
             listHtml.innerHTML += `
                 <li>
                     ${temp.text}
-                    <button class="del-btn" onclick="deleteTask(${temp.id})">X</button>
+                    <button class="del-btn" onclick="deleteTask(${temp.id})">Delete</button>
                 </li>`;
             temp = temp.next;
         }
     }
+    document.getElementById("taskInput").addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            addTask();
+        }
+    });
+
 </script>
 
 </body>
