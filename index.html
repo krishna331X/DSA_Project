@@ -17,3 +17,48 @@
     </div>
 </body>
 </html>
+<script>
+    // Ye Linked List ka logic hai (JavaScript mein)
+    class Node {
+        constructor(task) {
+            this.task = task;
+            this.next = null;
+        }
+    }
+
+    class LinkedList {
+        constructor() { this.head = null; }
+        
+        add(taskName) {
+            let newNode = new Node(taskName);
+            if (!this.head) {
+                this.head = newNode;
+            } else {
+                let temp = this.head;
+                while (temp.next) { temp = temp.next; }
+                temp.next = newNode;
+            }
+            this.display();
+        }
+
+        display() {
+            const listElement = document.getElementById("task-list");
+            listElement.innerHTML = ""; 
+            let temp = this.head;
+            while (temp) {
+                listElement.innerHTML += `<li>${temp.task}</li>`;
+                temp = temp.next;
+            }
+        }
+    }
+
+    const myTasks = new LinkedList();
+    function addNewTask() {
+        let val = document.getElementById("taskInput").value;
+        if(val) myTasks.add(val);
+    }
+</script>
+
+<input type="text" id="taskInput" placeholder="Enter task...">
+<button onclick="addNewTask()">Add Task</button>
+<ul id="task-list"></ul>
