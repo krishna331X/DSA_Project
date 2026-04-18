@@ -21,6 +21,18 @@ public:
         }
         cout << "Task saved!" << endl;
     }
+    void searchTask(string query) {
+    Node* temp = head;
+    bool found = false;
+    while (temp != nullptr) {
+        if (temp->data.desc.find(query) != string::npos) {
+            cout << "Found: [" << temp->data.id << "] " << temp->data.desc << endl;
+            found = true;
+        }
+        temp = temp->next;
+    }
+    if (!found) cout << "No task matches your search." << endl;
+    }
 
     void show() {
         Node* temp = head;
