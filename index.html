@@ -1,94 +1,93 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>My DSA To-Do List</title>
+    <title>Simple DSA To-Do</title>
     <style>
-        body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f4f7f6;
-    display: flex;
-    justify-content: center;
-    padding: 20px;
-}
-.app-container {
-    background: white;
-    width: 350px;
-    padding: 20px;
-    border-radius: 15px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-}
-h1 { color: #333; text-align: center; font-size: 24px; }
-.input-group { display: flex; gap: 10px; margin-bottom: 20px; }
-input { 
-    flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 5px; outline: none;
-}
-button { 
-    padding: 10px 15px; background-color: #27ae60; color: white; 
-    border: none; border-radius: 5px; cursor: pointer; transition: 0.3s;
-}
-button:hover { background-color: #219150; }
-ul { list-style: none; padding: 0; }
-li { 
-    background: #fff; border-bottom: 1px solid #eee; padding: 12px;
-    display: flex; justify-content: space-between; align-items: center;
-    transition: transform 0.2s;
-}
-li:hover { transform: scale(1.02); }
-.del-btn { background-color: #e74c3c; padding: 5px 10px; font-size: 12px; }
-.del-btn:hover { background-color: #c0392b; }
+        body { font-family: sans-serif; display: flex; justify-content: center; background: #f0f0f0; }
+        .box { background: white; padding: 20px; border-radius: 10px; width: 300px; margin-top: 50px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        input { padding: 8px; width: 180px; }
+        button { padding: 8px; cursor: pointer; }
+        li { background: #eee; margin-top: 5px; padding: 8px; display: flex; justify-content: space-between; border-radius: 4px; }
+        .del-btn { background: red; color: white; border: none; border-radius: 3px; cursor: pointer; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>DSA To-Do List Project</h1>
-        <p>This website uses <b>C++ Linked Lists</b> in the backend!</p>
-        <p>Status: Under Development</p>
-    </div>
-</body>
-</html>
+
+<div class="box">
+    <h3>My Tasks</h3>
+    <input type="text" id="taskInput" placeholder="Write task...">
+    <button onclick="addTask()">Add</button>
+    <ul id="taskList"></ul>
+</div>
+
 <script>
-    // Ye Linked List ka logic hai (JavaScript mein)
+    // 1. Linked List structure
     class Node {
-        constructor(task) {
-            this.task = task;
+        constructor(id, text) {
+            this.id = id;
+            this.text = text;
             this.next = null;
         }
     }
 
-    class LinkedList {
-        constructor() { this.head = null; }
-        
-        add(taskName) {
-            let newNode = new Node(taskName);
-            if (!this.head) {
-                this.head = newNode;
-            } else {
-                let temp = this.head;
-                while (temp.next) { temp = temp.next; }
-                temp.next = newNode;
-            }
-            this.display();
+    let head = null; // List ki shuruat
+    let count = 0;   // Har task ke liye unique ID
+
+    // 2. Insert at End
+    function addTask() {
+        let input = document.getElementById("taskInput");
+        if (input.value === "") return; // Khali input handle karein
+
+        count++;
+        let newNode = new Node(count, input.value);
+
+        if (head === null) {
+            head = newNode;
+        } else {
+            let temp = head;
+            while (temp.next !== null) { temp = temp.next; }
+            temp.next = newNode;
         }
 
-        display() {
-            const listElement = document.getElementById("task-list");
-            listElement.innerHTML = ""; 
-            let temp = this.head;
-            while (temp) {
-                listElement.innerHTML += `<li>${temp.task}</li>`;
-                temp = temp.next;
-            }
-        }
+        input.value = ""; // Box khali karein
+        render(); // Website update karein
     }
 
-    const myTasks = new LinkedList();
-    function addNewTask() {
-        let val = document.getElementById("taskInput").value;
-        if(val) myTasks.add(val);
+    // 3. To delete task
+    function deleteTask(id) {
+        if (head === null) return;
+
+        // Agar pehla hi task delete karna ho
+        if (head.id === id) {
+            head = head.next;
+        } else {
+            let temp = head;
+            while (temp.next !== null && temp.next.id !== id) {
+                temp = temp.next;
+            }
+            if (temp.next !== null) {
+                temp.next = temp.next.next; // Connection tod kar aage jodna
+            }
+        }
+        render(); // Website update karein
+    }
+
+    // 4. To See in Screen
+    function render() {
+        let listHtml = document.getElementById("taskList");
+        listHtml.innerHTML = ""; // Purani list clear karein
+
+        let temp = head;
+        while (temp !== null) {
+            listHtml.innerHTML += `
+                <li>
+                    ${temp.text}
+                    <button class="del-btn" onclick="deleteTask(${temp.id})">X</button>
+                </li>`;
+            temp = temp.next;
+        }
     }
 </script>
 
-<input type="text" id="taskInput" placeholder="Enter task...">
-<button onclick="addNewTask()">Add Task</button>
-<ul id="task-list"></ul>
+</body>
+</html>
