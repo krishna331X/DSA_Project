@@ -1,80 +1,76 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Pro DSA To-Do List</title>
+    <title>Advanced DSA Task Manager</title>
     <style>
         :root {
-            --bg: #0f172a;
-            --card: #1e293b;
-            --text: #f8fafc;
-            --primary: #38bdf8;
-            --accent: #ef4444;
-            --success: #22c55e;
+            --bg: #0f172a; --card: #1e293b; --text: #f8fafc;
+            --primary: #38bdf8; --accent: #ef4444; --success: #22c55e;
         }
         body { 
-            font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text);
-            display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 40px 20px;
+            font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text);
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 20px;
         }
-        h2 { color: var(--primary); font-weight: 700; letter-spacing: -1px; margin-bottom: 30px; }
-        .container { background: var(--card); padding: 30px; border-radius: 20px; width: 100%; max-width: 400px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); }
-        .input-group { display: flex; gap: 10px; margin-bottom: 25px; }
-        input { 
-            flex: 1; background: #334155; border: 1px solid #475569; padding: 12px 16px; 
-            border-radius: 12px; color: white; outline: none; transition: 0.3s;
-        }
-        input:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2); }
-        button { 
-            padding: 12px 18px; border-radius: 12px; border: none; cursor: pointer; 
-            font-weight: 600; transition: 0.2s; 
-        }
+        .header { text-align: center; margin-bottom: 20px; }
+        .header h2 { color: var(--primary); margin-bottom: 5px; }
+        
+        /* Progress Bar Styling */
+        .progress-container { width: 100%; max-width: 400px; background: #334155; height: 10px; border-radius: 5px; margin-bottom: 20px; overflow: hidden; }
+        #progressBar { width: 0%; height: 100%; background: var(--success); transition: width 0.5s ease; }
+        
+        .stats { font-size: 14px; margin-bottom: 10px; color: #94a3b8; }
+
+        .container { background: var(--card); padding: 25px; border-radius: 20px; width: 100%; max-width: 400px; box-shadow: 0 20px 25px rgba(0,0,0,0.3); }
+        .input-group { display: flex; gap: 10px; margin-bottom: 20px; }
+        input { flex: 1; background: #334155; border: 1px solid #475569; padding: 12px; border-radius: 10px; color: white; outline: none; }
+        
+        button { padding: 10px 15px; border-radius: 10px; border: none; cursor: pointer; font-weight: 600; transition: 0.2s; }
         .add-btn { background: var(--primary); color: #0f172a; }
-        .undo-btn { background: transparent; border: 1px solid var(--primary); color: var(--primary); margin-top: 15px; width: 100%; }
-        .undo-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-        ul { list-style: none; padding: 0; margin-top: 20px; }
+        .undo-btn { background: transparent; border: 1px solid var(--primary); color: var(--primary); margin-top: 10px; width: 100%; font-size: 13px; }
+        
+        ul { list-style: none; padding: 0; }
         li { 
-            background: #334155; margin-bottom: 12px; padding: 14px; border-radius: 12px;
-            display: flex; justify-content: space-between; align-items: center; animation: slideIn 0.3s ease;
+            background: #334155; margin-bottom: 10px; padding: 12px; border-radius: 10px;
+            display: flex; justify-content: space-between; align-items: center; transition: 0.3s;
         }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .task-text { flex: 1; cursor: pointer; transition: 0.3s; }
-        .completed { text-decoration: line-through; opacity: 0.5; color: #94a3b8; }
-        .actions { display: flex; gap: 8px; }
-        .del-btn { background: var(--accent); color: white; padding: 6px 10px; font-size: 12px; }
-        .check-btn { background: var(--success); color: white; padding: 6px 10px; font-size: 12px; }
+        .completed { text-decoration: line-through; opacity: 0.5; }
+        .actions button { padding: 5px 8px; margin-left: 5px; font-size: 12px; }
     </style>
 </head>
 <body>
 
-    <h2>DSA Project: Linked List Pro</h2>
+    <div class="header">
+        <h2>Linked List Task Manager</h2>
+        <div class="stats" id="stats">Total: 0 | Done: 0</div>
+        <div class="progress-container">
+            <div id="progressBar"></div>
+        </div>
+    </div>
 
     <div class="container">
         <div class="input-group">
-            <input type="text" id="taskInput" placeholder="Add a master task...">
+            <input type="text" id="taskInput" placeholder="Add a new goal...">
             <button class="add-btn" onclick="addTask()">Add</button>
         </div>
         
         <ul id="taskList"></ul>
-
-        <button id="undoBtn" class="undo-btn" onclick="undoDelete()" disabled>↺ Undo Last Delete (Stack)</button>
+        <button id="undoBtn" class="undo-btn" onclick="undoDelete()" disabled>↺ Undo Delete (Stack Pop)</button>
     </div>
 
 <script>
     class Node {
         constructor(id, text) {
-            this.id = id;
-            this.text = text;
-            this.completed = false;
-            this.next = null;
+            this.id = id; this.text = text; this.completed = false; this.next = null;
         }
     }
 
     let head = null;
-    let deleteStack = []; // Stack for Undo functionality
+    let deleteStack = [];
     let count = 0;
 
     function addTask() {
         let input = document.getElementById("taskInput");
-        if (input.value.trim() === "") return;
+        if (!input.value.trim()) return;
         count++;
         let newNode = new Node(count, input.value);
         if (!head) head = newNode;
@@ -98,22 +94,15 @@
 
     function deleteTask(id) {
         if (!head) return;
-        let deletedNode = null;
-
-        if (head.id === id) {
-            deletedNode = head;
-            head = head.next;
-        } else {
+        let deleted = null;
+        if (head.id === id) { deleted = head; head = head.next; }
+        else {
             let temp = head;
             while (temp.next && temp.next.id !== id) temp = temp.next;
-            if (temp.next) {
-                deletedNode = temp.next;
-                temp.next = temp.next.next;
-            }
+            if (temp.next) { deleted = temp.next; temp.next = temp.next.next; }
         }
-
-        if (deletedNode) {
-            deleteStack.push({ text: deletedNode.text, completed: deletedNode.completed });
+        if (deleted) {
+            deleteStack.push({ text: deleted.text, completed: deleted.completed });
             document.getElementById("undoBtn").disabled = false;
         }
         render();
@@ -121,19 +110,14 @@
 
     function undoDelete() {
         if (deleteStack.length === 0) return;
-        let lastTask = deleteStack.pop();
+        let last = deleteStack.pop();
         count++;
-        let newNode = new Node(count, lastTask.text);
-        newNode.completed = lastTask.completed;
-        
-        // Push back to list (Stack to List)
+        let newNode = new Node(count, last.text);
+        newNode.completed = last.completed;
         if (!head) head = newNode;
         else {
-            let temp = head;
-            while (temp.next) temp = temp.next;
-            temp.next = newNode;
+            let temp = head; while (temp.next) temp = temp.next; temp.next = newNode;
         }
-
         if (deleteStack.length === 0) document.getElementById("undoBtn").disabled = true;
         render();
     }
@@ -142,19 +126,26 @@
         let listHtml = document.getElementById("taskList");
         listHtml.innerHTML = "";
         let temp = head;
+        let total = 0, done = 0;
+
         while (temp) {
+            total++;
+            if (temp.completed) done++;
             listHtml.innerHTML += `
-                <li>
-                    <span class="task-text ${temp.completed ? 'completed' : ''}" onclick="toggleComplete(${temp.id})">
-                        ${temp.text}
-                    </span>
+                <li class="${temp.completed ? 'completed' : ''}">
+                    <span>${temp.text}</span>
                     <div class="actions">
-                        <button class="check-btn" onclick="toggleComplete(${temp.id})">✓</button>
-                        <button class="del-btn" onclick="deleteTask(${temp.id})">✕</button>
+                        <button style="background:var(--success)" onclick="toggleComplete(${temp.id})">✓</button>
+                        <button style="background:var(--accent)" onclick="deleteTask(${temp.id})">✕</button>
                     </div>
                 </li>`;
             temp = temp.next;
         }
+
+        // Update Stats & Progress Bar
+        document.getElementById("stats").innerText = `Total Tasks: ${total} | Completed: ${done}`;
+        let percent = total === 0 ? 0 : (done / total) * 100;
+        document.getElementById("progressBar").style.width = percent + "%";
     }
 
     document.getElementById("taskInput").addEventListener("keypress", (e) => { if(e.key === "Enter") addTask(); });
