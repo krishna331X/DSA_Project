@@ -78,21 +78,44 @@
     function addTask() {
         let tInput = document.getElementById("taskInput");
         let dInput = document.getElementById("durationInput");
-        if (!tInput.value.trim() || !dInput.value) return;
+        
+        if (!tInput.value.trim() || !dInput.value) {
+            alert("Please enter both Task and Duration!");
+            return;
+        }
 
         count++;
         let newNode = new Node(count, tInput.value, dInput.value);
-        if (!head) head = newNode;
-        else {
+        
+        if (!head) {
+            head = newNode;
+        } else {
             let temp = head;
-            while (temp.next) temp = temp.next;
+            while (temp.next) {
+                temp = temp.next;
+            }
             temp.next = newNode;
         }
-        tInput.value = ""; dInput.value = "";
+        
+        tInput.value = ""; 
+        dInput.value = "";
         render();
     }
 
-    // --- BUBBLE SORT LOGIC FOR LINKED LIST ---
+    // Tick Mark (Complete) Logic
+    function toggleComplete(id) {
+        let temp = head;
+        while (temp) {
+            if (temp.id === id) {
+                temp.completed = !temp.completed;
+                break;
+            }
+            temp = temp.next;
+        }
+        render();
+    }
+
+    // Bubble Sort Logic
     function sortTasks() {
         if (!head || !head.next) return;
         let swapped;
@@ -105,18 +128,21 @@
 
             while (ptr1.next != lptr) {
                 if (ptr1.duration > ptr1.next.duration) {
-                    // Data swapping logic
+                    // Data swapping
                     let tempText = ptr1.text;
                     let tempDur = ptr1.duration;
                     let tempComp = ptr1.completed;
+                    let tempId = ptr1.id; // Swapping ID too for stability
                     
                     ptr1.text = ptr1.next.text;
                     ptr1.duration = ptr1.next.duration;
                     ptr1.completed = ptr1.next.completed;
+                    ptr1.id = ptr1.next.id;
                     
                     ptr1.next.text = tempText;
                     ptr1.next.duration = tempDur;
                     ptr1.next.completed = tempComp;
+                    ptr1.next.id = tempId;
                     
                     swapped = 1;
                 }
@@ -129,24 +155,22 @@
 
     function deleteTask(id) {
         let deleted = null;
-        if (head.id === id) { deleted = head; head = head.next; }
-        else {
+        if (head.id === id) {
+            deleted = head;
+            head = head.next;
+        } else {
             let temp = head;
-            while (temp.next && temp.next.id !== id) temp = temp.next;
-            if (temp.next) { deleted = temp.next; temp.next = temp.next.next; }
+            while (temp.next && temp.next.id !== id) {
+                temp = temp.next;
+            }
+            if (temp.next) {
+                deleted = temp.next;
+                temp.next = temp.next.next;
+            }
         }
         if (deleted) {
             deleteStack.push({ text: deleted.text, duration: deleted.duration, completed: deleted.completed });
             document.getElementById("undoBtn").disabled = false;
-        }
-        render();
-    }
-
-    function toggleComplete(id) {
-        let temp = head;
-        while (temp) {
-            if (temp.id === id) temp.completed = !temp.completed;
-            temp = temp.next;
         }
         render();
     }
@@ -175,13 +199,23 @@
                         <div class="duration-badge">⏱ ${temp.duration} mins</div>
                     </div>
                     <div style="display:flex; gap:8px;">
-                        <button style="background:var(--success); color:white; border:none; padding:8px; border-radius:8px;" onclick="toggleComplete(${temp.id})">✓</button>
-                        <button style="background:var(--danger); color:white; border:none; padding:8px; border-radius:8px;" onclick="deleteTask(${temp.id})">✕</button>
+                        <button style="background:#10b981; color:white; border:none; padding:8px; border-radius:8px; cursor:pointer;" onclick="toggleComplete(${temp.id})">✓</button>
+                        <button style="background:#ef4444; color:white; border:none; padding:8px; border-radius:8px; cursor:pointer;" onclick="deleteTask(${temp.id})">✕</button>
                     </div>
                 </li>`;
             temp = temp.next;
         }
     }
+
+    // --- FIX: ENTER KEY LOGIC ---
+    // Task Input aur Duration Input dono par Enter kaam karega
+    document.getElementById("taskInput").addEventListener("keypress", function(e) {
+        if (e.key === "Enter") addTask();
+    });
+    document.getElementById("durationInput").addEventListener("keypress", function(e) {
+        if (e.key === "Enter") addTask();
+    });
+
 </script>
 </body>
 </html>
