@@ -1,221 +1,54 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Lync Task Manager Pro</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glow & Gloss | Luxury Nail Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg: #0b0f1a; --card: #161b2c; --text: #f8fafc;
-            --primary: #38bdf8; --accent: #8b5cf6; --success: #10b981; --danger: #ef4444;
-        }
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text);
-            margin: 0; padding: 40px 20px; display: flex; flex-direction: column; align-items: center;
-        }
-        .app-header { text-align: center; margin-bottom: 30px; }
-        .app-header h1 { margin: 0; font-size: 2.5rem; letter-spacing: -1px; background: linear-gradient(to right, #38bdf8, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        
-        .dashboard { background: var(--card); border-radius: 24px; width: 100%; max-width: 550px; padding: 25px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); border: 1px solid #2d3748; }
-        
-        .input-section { display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px; }
-        .row { display: flex; gap: 8px; }
-        
-        input, select { background: #1e293b; border: 1px solid #334155; padding: 12px; border-radius: 12px; color: white; outline: none; font-size: 14px; }
-        #taskInput { flex: 2; }
-        #durationInput { flex: 1; }
-
-        .button-group { display: flex; gap: 10px; margin-bottom: 20px; }
-        .btn { flex: 1; padding: 12px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        .btn-add { background: var(--primary); color: #0b0f1a; }
-        .btn-sort { background: var(--accent); color: white; }
-        
-        .task-item { 
-            background: #1e293b; margin-bottom: 12px; padding: 16px; border-radius: 16px;
-            display: flex; justify-content: space-between; align-items: center; border: 1px solid #334155;
-        }
-        .duration-badge { font-size: 11px; background: rgba(139, 92, 246, 0.2); color: var(--accent); padding: 4px 8px; border-radius: 8px; margin-top: 5px; display: inline-block; }
-        
-        .completed span { text-decoration: line-through; opacity: 0.4; }
-        .btn-undo { background: none; border: 1px dashed var(--primary); color: var(--primary); padding: 10px; border-radius: 12px; width: 100%; cursor: pointer; }
+        body { font-family: 'Poppins', sans-serif; background-color: #fdf6f6; }
+        .luxury-font { font-family: 'Playfair Display', serif; }
+        .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3); }
     </style>
 </head>
-<body>
+<body class="text-gray-800">
 
-    <div class="app-header">
-        <h1>Lync</h1>
-        <p>Linked-List Engine with Bubble Sort</p>
-    </div>
+    <header class="h-64 flex flex-col items-center justify-center bg-pink-100 border-b border-pink-200">
+        <h1 class="luxury-font text-5xl text-pink-600">Glow & Gloss</h1>
+        <p class="tracking-widest uppercase text-sm mt-2 text-pink-400">Exquisite Nail Artistry</p>
+    </header>
 
-    <div class="dashboard">
-        <div class="input-section">
-            <div class="row">
-                <input type="text" id="taskInput" placeholder="Task description...">
-                <input type="number" id="durationInput" placeholder="Min" min="1">
-                <button class="btn btn-add" onclick="addTask()">Add Task</button>
-            </div>
-            <button class="btn btn-sort" onclick="sortTasks()">⚡ Sort by Duration (Bubble Sort)</button>
+    <main class="max-w-6xl mx-auto p-6 grid grid-cols-1 md:grid-cols-3 gap-8">
+        
+        <div class="glass p-6 rounded-2xl shadow-xl">
+            <h2 class="luxury-font text-2xl mb-4 text-pink-700">Book Appointment</h2>
+            <input id="custName" type="text" placeholder="Customer Name" class="w-full p-3 mb-3 rounded-lg border focus:ring-2 focus:ring-pink-300 outline-none">
+            <select id="service" class="w-full p-3 mb-3 rounded-lg border outline-none">
+                <option>Gel Extensions - ₹1200</option>
+                <option>Chrome Art - ₹800</option>
+                <option>Classic Manicure - ₹500</option>
+            </select>
+            <button onclick="bookAppt()" class="w-full bg-pink-500 text-white p-3 rounded-lg hover:bg-pink-600 transition">Confirm Booking</button>
         </div>
-        
-        <ul id="taskList" style="list-style:none; padding:0;"></ul>
 
-        <button id="undoBtn" class="btn-undo" onclick="undoDelete()" disabled>↺ Undo Last Delete</button>
-    </div>
+        <div class="glass p-6 rounded-2xl shadow-xl border-t-4 border-pink-400">
+            <h2 class="luxury-font text-2xl mb-4">Walk-in Queue</h2>
+            <div id="queueList" class="space-y-2 mb-4 h-32 overflow-y-auto">
+                </div>
+            <button onclick="addWalkIn()" class="w-full border-2 border-pink-400 text-pink-600 p-2 rounded-lg hover:bg-pink-50">Add Walk-in</button>
+            <button onclick="serveQueue()" class="w-full mt-2 bg-gray-800 text-white p-2 rounded-lg">Serve Next</button>
+        </div>
 
-<script>
-    class Node {
-        constructor(id, text, duration) {
-            this.id = id;
-            this.text = text;
-            this.duration = parseInt(duration) || 0;
-            this.completed = false;
-            this.next = null;
-        }
-    }
+        <div class="glass p-6 rounded-2xl shadow-xl">
+            <h2 class="luxury-font text-2xl mb-4">Admin Actions</h2>
+            <div id="appointmentList" class="text-sm space-y-2 mb-4">
+                </div>
+            <button onclick="undoAction()" class="w-full bg-yellow-100 text-yellow-700 p-2 rounded-lg border border-yellow-300">↺ Undo Last Booking</button>
+        </div>
 
-    let head = null;
-    let deleteStack = [];
-    let count = 0;
+    </main>
 
-    function addTask() {
-        let tInput = document.getElementById("taskInput");
-        let dInput = document.getElementById("durationInput");
-        
-        if (!tInput.value.trim() || !dInput.value) {
-            alert("Please enter both Task and Duration!");
-            return;
-        }
-
-        count++;
-        let newNode = new Node(count, tInput.value, dInput.value);
-        
-        if (!head) {
-            head = newNode;
-        } else {
-            let temp = head;
-            while (temp.next) {
-                temp = temp.next;
-            }
-            temp.next = newNode;
-        }
-        
-        tInput.value = ""; 
-        dInput.value = "";
-        render();
-    }
-
-    // Tick Mark (Complete) Logic
-    function toggleComplete(id) {
-        let temp = head;
-        while (temp) {
-            if (temp.id === id) {
-                temp.completed = !temp.completed;
-                break;
-            }
-            temp = temp.next;
-        }
-        render();
-    }
-
-    // Bubble Sort Logic
-    function sortTasks() {
-        if (!head || !head.next) return;
-        let swapped;
-        let ptr1;
-        let lptr = null;
-
-        do {
-            swapped = 0;
-            ptr1 = head;
-
-            while (ptr1.next != lptr) {
-                if (ptr1.duration > ptr1.next.duration) {
-                    // Data swapping
-                    let tempText = ptr1.text;
-                    let tempDur = ptr1.duration;
-                    let tempComp = ptr1.completed;
-                    let tempId = ptr1.id; // Swapping ID too for stability
-                    
-                    ptr1.text = ptr1.next.text;
-                    ptr1.duration = ptr1.next.duration;
-                    ptr1.completed = ptr1.next.completed;
-                    ptr1.id = ptr1.next.id;
-                    
-                    ptr1.next.text = tempText;
-                    ptr1.next.duration = tempDur;
-                    ptr1.next.completed = tempComp;
-                    ptr1.next.id = tempId;
-                    
-                    swapped = 1;
-                }
-                ptr1 = ptr1.next;
-            }
-            lptr = ptr1;
-        } while (swapped);
-        render();
-    }
-
-    function deleteTask(id) {
-        let deleted = null;
-        if (head.id === id) {
-            deleted = head;
-            head = head.next;
-        } else {
-            let temp = head;
-            while (temp.next && temp.next.id !== id) {
-                temp = temp.next;
-            }
-            if (temp.next) {
-                deleted = temp.next;
-                temp.next = temp.next.next;
-            }
-        }
-        if (deleted) {
-            deleteStack.push({ text: deleted.text, duration: deleted.duration, completed: deleted.completed });
-            document.getElementById("undoBtn").disabled = false;
-        }
-        render();
-    }
-
-    function undoDelete() {
-        if (deleteStack.length === 0) return;
-        let last = deleteStack.pop();
-        count++;
-        let newNode = new Node(count, last.text, last.duration);
-        newNode.completed = last.completed;
-        if (!head) head = newNode;
-        else { let temp = head; while(temp.next) temp = temp.next; temp.next = newNode; }
-        if (deleteStack.length === 0) document.getElementById("undoBtn").disabled = true;
-        render();
-    }
-
-    function render() {
-        let listHtml = document.getElementById("taskList");
-        listHtml.innerHTML = "";
-        let temp = head;
-        while (temp) {
-            listHtml.innerHTML += `
-                <li class="task-item ${temp.completed ? 'completed' : ''}">
-                    <div>
-                        <div style="font-weight:bold;">${temp.text}</div>
-                        <div class="duration-badge">⏱ ${temp.duration} mins</div>
-                    </div>
-                    <div style="display:flex; gap:8px;">
-                        <button style="background:#10b981; color:white; border:none; padding:8px; border-radius:8px; cursor:pointer;" onclick="toggleComplete(${temp.id})">✓</button>
-                        <button style="background:#ef4444; color:white; border:none; padding:8px; border-radius:8px; cursor:pointer;" onclick="deleteTask(${temp.id})">✕</button>
-                    </div>
-                </li>`;
-            temp = temp.next;
-        }
-    }
-
-    // --- FIX: ENTER KEY LOGIC ---
-    // Task Input aur Duration Input dono par Enter kaam karega
-    document.getElementById("taskInput").addEventListener("keypress", function(e) {
-        if (e.key === "Enter") addTask();
-    });
-    document.getElementById("durationInput").addEventListener("keypress", function(e) {
-        if (e.key === "Enter") addTask();
-    });
-
-</script>
+    <script src="script.js"></script>
 </body>
 </html>

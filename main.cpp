@@ -1,51 +1,111 @@
 #include <iostream>
-#include "Task.h"
+#include <string>
+#include <vector>
+#include <queue>
+#include <stack>
+#include <iomanip>
 
 using namespace std;
 
-class TodoList {
-private:
-    Node* head;
-public:
-    TodoList() : head(nullptr) {}
+// --- LINKED LIST: Har appointment ek Node hai ---
+struct Appointment {
+    int id;
+    string name;
+    string service;
+    Appointment* next;
+    
+    Appointment(int i, string n, string s) : id(i), name(n), service(s), next(nullptr) {}
+};
 
-    void addTask(int id, string d, int p) {
-        Task newTask(id, d, p);
-        Node* newNode = new Node(newTask);
-        if (head == nullptr) {
+class NailStudioSystem {
+private:
+    Appointment* head;         // Linked List for scheduled tasks
+    queue<string> walkInQueue; // Queue for waiting area
+    stack<string> logs;        // Stack for undo/history tracking
+
+public:
+    NailStudioSystem() : head(nullptr) {}
+
+    // [LINKED LIST] - Adding new booking
+    void bookAppointment(int id, string name, string service) {
+        Appointment* newNode = new Appointment(id, name, service);
+        if (!head) {
             head = newNode;
         } else {
-            Node* temp = head;
-            while (temp->next != nullptr) temp = temp->next;
+            Appointment* temp = head;
+            while (temp->next) temp = temp->next;
             temp->next = newNode;
         }
-        cout << "Task saved!" << endl;
-    }
-    void searchTask(string query) {
-    Node* temp = head;
-    bool found = false;
-    while (temp != nullptr) {
-        if (temp->data.desc.find(query) != string::npos) {
-            cout << "Found: [" << temp->data.id << "] " << temp->data.desc << endl;
-            found = true;
-        }
-        temp = temp->next;
-    }
-    if (!found) cout << "No task matches your search." << endl;
+        logs.push("Booked: " + name);
+        cout << "✅ Success: Appointment added for " << name << endl;
     }
 
-    void show() {
-        Node* temp = head;
-        while (temp != nullptr) {
-            cout << temp->data.id << ": " << temp->data.desc << endl;
+    // [QUEUE] - Adding to waiting list
+    void addWalkIn(string name) {
+        walkInQueue.push(name);
+        cout << "⌛ " << name << " is now in the waiting queue." << endl;
+    }
+
+    // [QUEUE] - Serving next person
+    void serveNext() {
+        if (!walkInQueue.empty()) {
+            cout << "💅 Now serving from waitlist: " << walkInQueue.front() << endl;
+            walkInQueue.pop();
+        } else {
+            cout << "📭 No one is in the waiting queue." << endl;
+        }
+    }
+
+    // [STACK] - Undo last action
+    void undoLastAction() {
+        if (!logs.empty()) {
+            cout << "⏪ Undoing: " << logs.top() << endl;
+            logs.pop();
+        } else {
+            cout << "🚫 No actions to undo." << endl;
+        }
+    }
+
+    // [SEARCHING] - Linear Search in Linked List
+    void findCustomer(string name) {
+        Appointment* temp = head;
+        while (temp) {
+            if (temp->name == name) {
+                cout << "🔍 Found: " << name << " for " << temp->service << " (ID: " << temp->id << ")" << endl;
+                return;
+            }
             temp = temp->next;
         }
+        cout << "❌ Customer not found." << endl;
+    }
+
+    void displayAll() {
+        cout << "\n--- CURRENT APPOINTMENTS ---" << endl;
+        Appointment* temp = head;
+        while (temp) {
+            cout << "[" << temp->id << "] " << temp->name << " -> " << temp->service << endl;
+            temp = temp->next;
+        }
+        cout << "---------------------------\n" << endl;
     }
 };
 
 int main() {
-    TodoList list;
-    list.addTask(1, "Website Design", 1);
-    list.show();
+    NailStudioSystem studio;
+    
+    cout << "--- GLOW & GLOSS PREMIUM SYSTEM ---" << endl;
+    
+    // Demonstrating Logic
+    studio.bookAppointment(101, "Ananya", "Gel Extensions");
+    studio.bookAppointment(102, "Riya", "Chrome Art");
+    studio.addWalkIn("Sonal");
+    studio.addWalkIn("Kavita");
+    
+    studio.displayAll();
+    
+    studio.findCustomer("Riya");
+    studio.serveNext();
+    studio.undoLastAction();
+
     return 0;
 }
