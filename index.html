@@ -1,68 +1,73 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Advanced DSA Task Manager</title>
+    <title>Lync Task Manager Pro</title>
     <style>
         :root {
-            --bg: #0f172a; --card: #1e293b; --text: #f8fafc;
-            --primary: #38bdf8; --accent: #ef4444; --success: #22c55e;
+            --bg: #0b0f1a; --card: #161b2c; --text: #f8fafc;
+            --primary: #38bdf8; --accent: #8b5cf6; --success: #10b981; --danger: #ef4444;
         }
         body { 
-            font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text);
-            display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 20px;
+            font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text);
+            margin: 0; padding: 40px 20px; display: flex; flex-direction: column; align-items: center;
         }
-        .header { text-align: center; margin-bottom: 20px; }
-        .header h2 { color: var(--primary); margin-bottom: 5px; }
+        .app-header { text-align: center; margin-bottom: 30px; }
+        .app-header h1 { margin: 0; font-size: 2.5rem; letter-spacing: -1px; background: linear-gradient(to right, #38bdf8, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         
-        /* Progress Bar Styling */
-        .progress-container { width: 100%; max-width: 400px; background: #334155; height: 10px; border-radius: 5px; margin-bottom: 20px; overflow: hidden; }
-        #progressBar { width: 0%; height: 100%; background: var(--success); transition: width 0.5s ease; }
+        .dashboard { background: var(--card); border-radius: 24px; width: 100%; max-width: 550px; padding: 25px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); border: 1px solid #2d3748; }
         
-        .stats { font-size: 14px; margin-bottom: 10px; color: #94a3b8; }
+        .input-section { display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px; }
+        .row { display: flex; gap: 8px; }
+        
+        input, select { background: #1e293b; border: 1px solid #334155; padding: 12px; border-radius: 12px; color: white; outline: none; font-size: 14px; }
+        #taskInput { flex: 2; }
+        #durationInput { flex: 1; }
 
-        .container { background: var(--card); padding: 25px; border-radius: 20px; width: 100%; max-width: 400px; box-shadow: 0 20px 25px rgba(0,0,0,0.3); }
-        .input-group { display: flex; gap: 10px; margin-bottom: 20px; }
-        input { flex: 1; background: #334155; border: 1px solid #475569; padding: 12px; border-radius: 10px; color: white; outline: none; }
+        .button-group { display: flex; gap: 10px; margin-bottom: 20px; }
+        .btn { flex: 1; padding: 12px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-add { background: var(--primary); color: #0b0f1a; }
+        .btn-sort { background: var(--accent); color: white; }
         
-        button { padding: 10px 15px; border-radius: 10px; border: none; cursor: pointer; font-weight: 600; transition: 0.2s; }
-        .add-btn { background: var(--primary); color: #0f172a; }
-        .undo-btn { background: transparent; border: 1px solid var(--primary); color: var(--primary); margin-top: 10px; width: 100%; font-size: 13px; }
-        
-        ul { list-style: none; padding: 0; }
-        li { 
-            background: #334155; margin-bottom: 10px; padding: 12px; border-radius: 10px;
-            display: flex; justify-content: space-between; align-items: center; transition: 0.3s;
+        .task-item { 
+            background: #1e293b; margin-bottom: 12px; padding: 16px; border-radius: 16px;
+            display: flex; justify-content: space-between; align-items: center; border: 1px solid #334155;
         }
-        .completed { text-decoration: line-through; opacity: 0.5; }
-        .actions button { padding: 5px 8px; margin-left: 5px; font-size: 12px; }
+        .duration-badge { font-size: 11px; background: rgba(139, 92, 246, 0.2); color: var(--accent); padding: 4px 8px; border-radius: 8px; margin-top: 5px; display: inline-block; }
+        
+        .completed span { text-decoration: line-through; opacity: 0.4; }
+        .btn-undo { background: none; border: 1px dashed var(--primary); color: var(--primary); padding: 10px; border-radius: 12px; width: 100%; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-    <h2>Lync Task Manager</h2>
-    <p style="font-size: 12px; color: #94a3b8; margin-top: -5px;">Linking productivity, one node at a time.</p>
-    
-    <div class="stats" id="stats">Total Tasks: 0 | Completed: 0</div>
-    <div class="progress-container">
-        <div id="progressBar"></div>
+    <div class="app-header">
+        <h1>Lync</h1>
+        <p>Linked-List Engine with Bubble Sort</p>
     </div>
-</div>
 
-    <div class="container">
-        <div class="input-group">
-            <input type="text" id="taskInput" placeholder="Add a new goal...">
-            <button class="add-btn" onclick="addTask()">Add</button>
+    <div class="dashboard">
+        <div class="input-section">
+            <div class="row">
+                <input type="text" id="taskInput" placeholder="Task description...">
+                <input type="number" id="durationInput" placeholder="Min" min="1">
+                <button class="btn btn-add" onclick="addTask()">Add Task</button>
+            </div>
+            <button class="btn btn-sort" onclick="sortTasks()">⚡ Sort by Duration (Bubble Sort)</button>
         </div>
         
-        <ul id="taskList"></ul>
-        <button id="undoBtn" class="undo-btn" onclick="undoDelete()" disabled>↺ Undo Delete (Stack Pop)</button>
+        <ul id="taskList" style="list-style:none; padding:0;"></ul>
+
+        <button id="undoBtn" class="btn-undo" onclick="undoDelete()" disabled>↺ Undo Last Delete</button>
     </div>
 
 <script>
     class Node {
-        constructor(id, text) {
-            this.id = id; this.text = text; this.completed = false; this.next = null;
+        constructor(id, text, duration) {
+            this.id = id;
+            this.text = text;
+            this.duration = parseInt(duration) || 0;
+            this.completed = false;
+            this.next = null;
         }
     }
 
@@ -71,17 +76,69 @@
     let count = 0;
 
     function addTask() {
-        let input = document.getElementById("taskInput");
-        if (!input.value.trim()) return;
+        let tInput = document.getElementById("taskInput");
+        let dInput = document.getElementById("durationInput");
+        if (!tInput.value.trim() || !dInput.value) return;
+
         count++;
-        let newNode = new Node(count, input.value);
+        let newNode = new Node(count, tInput.value, dInput.value);
         if (!head) head = newNode;
         else {
             let temp = head;
             while (temp.next) temp = temp.next;
             temp.next = newNode;
         }
-        input.value = "";
+        tInput.value = ""; dInput.value = "";
+        render();
+    }
+
+    // --- BUBBLE SORT LOGIC FOR LINKED LIST ---
+    function sortTasks() {
+        if (!head || !head.next) return;
+        let swapped;
+        let ptr1;
+        let lptr = null;
+
+        do {
+            swapped = 0;
+            ptr1 = head;
+
+            while (ptr1.next != lptr) {
+                if (ptr1.duration > ptr1.next.duration) {
+                    // Data swapping logic
+                    let tempText = ptr1.text;
+                    let tempDur = ptr1.duration;
+                    let tempComp = ptr1.completed;
+                    
+                    ptr1.text = ptr1.next.text;
+                    ptr1.duration = ptr1.next.duration;
+                    ptr1.completed = ptr1.next.completed;
+                    
+                    ptr1.next.text = tempText;
+                    ptr1.next.duration = tempDur;
+                    ptr1.next.completed = tempComp;
+                    
+                    swapped = 1;
+                }
+                ptr1 = ptr1.next;
+            }
+            lptr = ptr1;
+        } while (swapped);
+        render();
+    }
+
+    function deleteTask(id) {
+        let deleted = null;
+        if (head.id === id) { deleted = head; head = head.next; }
+        else {
+            let temp = head;
+            while (temp.next && temp.next.id !== id) temp = temp.next;
+            if (temp.next) { deleted = temp.next; temp.next = temp.next.next; }
+        }
+        if (deleted) {
+            deleteStack.push({ text: deleted.text, duration: deleted.duration, completed: deleted.completed });
+            document.getElementById("undoBtn").disabled = false;
+        }
         render();
     }
 
@@ -94,32 +151,14 @@
         render();
     }
 
-    function deleteTask(id) {
-        if (!head) return;
-        let deleted = null;
-        if (head.id === id) { deleted = head; head = head.next; }
-        else {
-            let temp = head;
-            while (temp.next && temp.next.id !== id) temp = temp.next;
-            if (temp.next) { deleted = temp.next; temp.next = temp.next.next; }
-        }
-        if (deleted) {
-            deleteStack.push({ text: deleted.text, completed: deleted.completed });
-            document.getElementById("undoBtn").disabled = false;
-        }
-        render();
-    }
-
     function undoDelete() {
         if (deleteStack.length === 0) return;
         let last = deleteStack.pop();
         count++;
-        let newNode = new Node(count, last.text);
+        let newNode = new Node(count, last.text, last.duration);
         newNode.completed = last.completed;
         if (!head) head = newNode;
-        else {
-            let temp = head; while (temp.next) temp = temp.next; temp.next = newNode;
-        }
+        else { let temp = head; while(temp.next) temp = temp.next; temp.next = newNode; }
         if (deleteStack.length === 0) document.getElementById("undoBtn").disabled = true;
         render();
     }
@@ -128,29 +167,21 @@
         let listHtml = document.getElementById("taskList");
         listHtml.innerHTML = "";
         let temp = head;
-        let total = 0, done = 0;
-
         while (temp) {
-            total++;
-            if (temp.completed) done++;
             listHtml.innerHTML += `
-                <li class="${temp.completed ? 'completed' : ''}">
-                    <span>${temp.text}</span>
-                    <div class="actions">
-                        <button style="background:var(--success)" onclick="toggleComplete(${temp.id})">✓</button>
-                        <button style="background:var(--accent)" onclick="deleteTask(${temp.id})">✕</button>
+                <li class="task-item ${temp.completed ? 'completed' : ''}">
+                    <div>
+                        <div style="font-weight:bold;">${temp.text}</div>
+                        <div class="duration-badge">⏱ ${temp.duration} mins</div>
+                    </div>
+                    <div style="display:flex; gap:8px;">
+                        <button style="background:var(--success); color:white; border:none; padding:8px; border-radius:8px;" onclick="toggleComplete(${temp.id})">✓</button>
+                        <button style="background:var(--danger); color:white; border:none; padding:8px; border-radius:8px;" onclick="deleteTask(${temp.id})">✕</button>
                     </div>
                 </li>`;
             temp = temp.next;
         }
-
-        // Update Stats & Progress Bar
-        document.getElementById("stats").innerText = `Total Tasks: ${total} | Completed: ${done}`;
-        let percent = total === 0 ? 0 : (done / total) * 100;
-        document.getElementById("progressBar").style.width = percent + "%";
     }
-
-    document.getElementById("taskInput").addEventListener("keypress", (e) => { if(e.key === "Enter") addTask(); });
 </script>
 </body>
 </html>
